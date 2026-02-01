@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: farm-mgmt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: farm-mgmt
+  template:
+    metadata:
+      labels:
+        app: farm-mgmt
+    spec:
+      containers:
+      - name: farm-mgmt-container
+        image: nigethadocker/farm-mgmt:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: farm-mgmt-service
+spec:
+  selector:
+    app: farm-mgmt
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
