@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  # Frontend service
+  # Frontend service (Nginx)
   frontend-app:
     build: 
       context: .
@@ -10,10 +10,10 @@ services:
     depends_on:
       - backend-app
 
-  # Backend service
+  # Backend service (Node.js)
   backend-app:
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "4000:4000"  # Unga server.js-la irukura port 4000 correct-ah map aayidum
