@@ -1,8 +1,8 @@
-# Nginx use panna thaan app browser-la live-ah run aagum
+# Nginx Alpine image-ah use panrom (Very Small Size)
 FROM nginx:alpine
 
-# Unga project files-ah Nginx server folder-kulla copy panrom
-COPY . /usr/share/nginx/html/
+# Unga GitHub-la irukura 'frontend' folder-ah Nginx server-kulla copy panrom
+COPY ./frontend /usr/share/nginx/html/
 
-# Port 80-ah container-kaaga open panrom
+# Port 80-ah expose panrom
 EXPOSE 80
