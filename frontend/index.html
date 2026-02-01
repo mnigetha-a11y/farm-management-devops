@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>"Nigetha's Farm Portal"</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigetha's Farm Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        #status-box { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #fff; }
+        .success { color: #27ae60; font-weight: bold; }
+    </style>
 </head>
 <body>
 
@@ -16,13 +25,12 @@
     </div>
 
     <script>
-        // Backend URL (Unga port 4000)
         async function fetchStatus() {
             try {
+                // Backend URL check
                 const response = await fetch('http://localhost:4000/api/status');
                 const data = await response.json();
                 
-                // Backend-la irundhu vara message-ah inga update panrom
                 document.getElementById('backend-msg').innerText = data.message;
                 document.getElementById('backend-msg').classList.add('success');
             } catch (error) {
@@ -31,7 +39,6 @@
                 console.error("Error fetching status:", error);
             }
         }
-
         fetchStatus();
     </script>
 </body>
