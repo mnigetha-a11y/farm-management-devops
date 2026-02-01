@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Inga unga sariyaana repository URL matrum credential ID irukku
                 git branch: 'main', 
                     credentialsId: 'github-pat', 
                     url: 'https://github.com/mnigetha-a11y/farm-management-devops.git'
@@ -15,9 +14,8 @@ pipeline {
             steps {
                 script {
                     echo "Running SonarQube Analysis..."
-                    // SonarQube credentials-ah use panna intha block thevai
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        // Inga unga sonar-scanner command-ah poodunga
+                        // Sonar analysis commands inga varum
                     }
                 }
             }
@@ -27,9 +25,21 @@ pipeline {
             steps {
                 script {
                     echo "Building and Pushing Docker Image..."
-                    // Docker credentials-ah use panna intha block thevai
+                    // Docker credentials use pannudhu
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        // Inga unga docker build & push commands-ah poodunga
+                        
+                        // 1. Docker Hub Login
+                        bat "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                        
+                        // 2. Build Image with Build Number
+                        bat "docker build -t nigethadocker/farm-management-app:${env.BUILD_NUMBER} ."
+                        
+                        // 3. Tag as Latest
+                        bat "docker tag nigethadocker/farm-management-app:${env.BUILD_NUMBER} nigethadocker/farm-management-app:latest"
+                        
+                        // 4. Push to Docker Hub
+                        bat "docker push nigethadocker/farm-management-app:${env.BUILD_NUMBER}"
+                        bat "docker push nigethadocker/farm-management-app:latest"
                     }
                 }
             }
