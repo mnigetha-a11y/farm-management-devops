@@ -4,18 +4,23 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // GitHub-la irunthu code-ah edukum
+                // GitHub-il ninnu puthiya code edukunnu
                 checkout scm
             }
         }
 
         stage('Build and Deploy') {
             steps {
-                // Docker Compose moolama rendu container-aiyum onna build panni run pannum
-                // 'down' - pazhaya container-ah remove pannum
-                // 'up -d --build' - puthusa build panni background-la run pannum
+                // Pazhaya container-ne remove cheythu puthuthayi build cheyunnu
                 bat 'docker-compose down || true'
-                bat 'docker-compose up -d --build'
+                bat 'docker-compose up -d --build --force-recreate'
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                // Use cheyyatha pazhaya docker images remove cheyunnu (Storage save cheyyan)
+                bat 'docker image prune -f'
             }
         }
     }
