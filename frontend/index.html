@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Farm Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        #status-box { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #e8f5e9; }
+        .success { color: #27ae60; font-weight: bold; }
+    </style>
 </head>
 <body>
-  <h2>Farm Management System</h2>
-  <p>Welcome Farmer</p>
+
+    <div class="container">
+        <h1>🚜 Farm Management System</h1>
+        <p>Frontend is running on Nginx (Port 8085)</p>
+
+        <div id="status-box">
+            <p>Backend Status:</p>
+            <h3 id="backend-msg">Connecting to backend...</h3>
+        </div>
+    </div>
+
+    <script>
+        // Backend URL (Unga port 4000)
+        async function fetchStatus() {
+            try {
+                const response = await fetch('http://localhost:4000/api/status');
+                const data = await response.json();
+                
+                // Backend-la irundhu vara message-ah inga update panrom
+                document.getElementById('backend-msg').innerText = data.message;
+                document.getElementById('backend-msg').classList.add('success');
+            } catch (error) {
+                document.getElementById('backend-msg').innerText = "Backend Connection Failed!";
+                document.getElementById('backend-msg').style.color = "red";
+                console.error("Error fetching status:", error);
+            }
+        }
+
+        fetchStatus();
+    </script>
 </body>
 </html>
