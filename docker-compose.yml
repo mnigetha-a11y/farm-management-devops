@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    container_name: farm-backend
+    ports:
+      - "4000:4000"
+    networks:
+      - farm-net
+
+  frontend:
+    build: ./frontend
+    container_name: farm-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - farm-net
+
+networks:
+  farm-net:
+    driver: bridge
