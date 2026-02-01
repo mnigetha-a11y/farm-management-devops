@@ -4,39 +4,33 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // GitHub-la irundhu code-ah yedukkum
+                git branch: 'main', url: 'https://github.com/mnigetha-a11y/farm-mgmt.git'
             }
         }
 
-        stage('Test') {
+        stage('SonarQube Analysis') {
             steps {
-                bat 'cd backend && npm install && npm test'
-            }
-        }
-
-        stage('Code Analysis') {
-            steps {
-                script {
-                    // Jenkins Tools-la kudutha 'sonar-scanner' name-ah check pannikonga
-                    def scannerHome = tool 'sonar-scanner'
-                    
-                    // Jenkins System-la kudutha 'sonar-server' name-ah check pannikonga
-                    withSonarQubeEnv('sonar-server') {
-                        bat "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=farm-mgmt -Dsonar.sources=."
-                    }
+                // SonarQube scan pannum
+                withSonarQubeEnv('SonarQube') {
+                    bat "sonar-scanner -Dsonar.projectKey=farm-mgmt -Dsonar.sources=."
                 }
             }
         }
 
         stage('Build and Deploy') {
             steps {
-                bat 'docker-compose up -d --build'
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                bat 'docker image prune -f'
+                script {
+                    // Docker Image Build
+                    bat "docker build -t nigethadocker/farm-mgmt:latest ."
+                    
+                    // Docker Hub-ku login panni push pannum
+                    // 'docker-hub-creds' thaan neenga Jenkins-la create panna ID
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
+                        bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
+                        bat "docker push nigethadocker/farm-mgmt:latest"
+                    }
+                }
             }
         }
     }
