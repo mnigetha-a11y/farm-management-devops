@@ -1,8 +1,16 @@
-# Nginx use panni HTML file ah serve panrom
-FROM nginx:alpine
+# 1. Base image
+FROM node:18-alpine
 
-# Unga HTML files-a Nginx folder kulla podrom
-COPY . /usr/share/nginx/html
+WORKDIR /app
 
-# Port 80 open panrom
-EXPOSE 80
+# 2. Dependencies
+COPY package*.json ./
+RUN npm install
+
+# 3. Copy code
+COPY . .
+
+# 4. Frontend common-ah 3000 port-la run aagum
+EXPOSE 3000
+
+CMD ["npm", "start"]

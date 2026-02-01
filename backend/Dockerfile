@@ -1,20 +1,20 @@
-# 1. Base image - Node.js version 18 use panrom
+# 1. Base image: Ippo irukkura normal node-ku badhula alpine use panrom
 FROM node:18-alpine
 
-# 2. Container kulla /app nu oru folder create panni anga velai seiyum
+# 2. Working directory create panrom
 WORKDIR /app
 
-# 3. First package files-a mattum copy panrom (Cachcing-ku nalladhu)
+# 3. Dependency files-ai mattum munnadi copy panrom (Build speed-ku)
 COPY package*.json ./
 
-# 4. Libraries install panrom
+# 4. Libraries-ai install panrom
 RUN npm install
 
-# 5. Matha ellaa backend code-aiyum copy panrom
+# 5. Matha ellaa code-aiyum copy panrom
 COPY . .
 
-# 6. Backend run aagura port (Unga code-la 4000 nu sonninga)
+# 6. Backend run aaga vendiya port
 EXPOSE 4000
 
 # 7. App-ai start panna command
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
