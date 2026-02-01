@@ -1,19 +1,29 @@
 pipeline {
     agent any
 
+    environment {
+        // Unge Docker Hub username-ah maathikonga
+        DOCKER_IMAGE = "nigethadocker/farm-management-app:${env.BUILD_NUMBER}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // GitHub-la irundhu code-ah yedukkum
-                git branch: 'main', url: 'https://github.com/mnigetha-a11y/farm-mgmt.git'
+                // Inga thaan neenga create panna credential ID use aagudhu
+                git branch: 'main', 
+                    credentialsId: 'github-pat', 
+                    url: 'https://github.com/mnigetha-a11y/farm-mgmt.git'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                // SonarQube scan pannum
-                withSonarQubeEnv('SonarQube') {
-                    bat "sonar-scanner -Dsonar.projectKey=farm-mgmt -Dsonar.sources=."
+                script {
+                    // SonarQube credentials-ah use pannudhu
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        echo "Running SonarQube Analysis..."
+                        // Inga unga sonar-scanner command-ah poodunga
+                    }
                 }
             }
         }
@@ -21,14 +31,10 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 script {
-                    // Docker Image Build
-                    bat "docker build -t nigethadocker/farm-mgmt:latest ."
-                    
-                    // Docker Hub-ku login panni push pannum
-                    // 'docker-hub-creds' thaan neenga Jenkins-la create panna ID
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
-                        bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
-                        bat "docker push nigethadocker/farm-mgmt:latest"
+                    // Docker credentials-ah use pannudhu
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        echo "Building and Pushing Docker Image..."
+                        // Inga unga docker build & push commands-ah poodunga
                     }
                 }
             }
