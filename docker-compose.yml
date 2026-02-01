@@ -1,22 +1,19 @@
+version: '3.8'
 services:
-  backend:
-    build: ./backend
-    container_name: farm-backend
+  # Frontend service (Nginx)
+  frontend-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "4000:4000"
-    networks:
-      - farm-net
-
-  frontend:
-    build: ./frontend
-    container_name: farm-frontend
-    ports:
-      - "8081:80"
+      - "8085:80"
     depends_on:
-      - backend
-    networks:
-      - farm-net
+      - backend-app
 
-networks:
-  farm-net:
-    driver: bridge
+  # Backend service (Node.js)
+  backend-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"  # Unga server.js-la irukura port 4000 correct-ah map aayidum
