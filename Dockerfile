@@ -1,6 +1,7 @@
 FROM nginx:alpine
 
-# Unga frontend folder-kulla irukura files-ah copy panrom
-COPY frontend/ /usr/share/nginx/html/
+# Puriyura maari sollanum na: frontend folder-kulla irukkura 
+# index.html-ah sariyaa nginx-oda default folder-ku thallu nu solrom.
+COPY frontend/index.html /usr/share/nginx/html/index.html
 
 EXPOSE 80
