@@ -1,11 +1,8 @@
-# Alpine base image use panrom
-FROM alpine:latest
+# Nginx use panna thaan app browser-la live-ah run aagum
+FROM nginx:alpine
 
-# Working directory set panrom
-WORKDIR /app
+# Unga project files-ah Nginx server folder-kulla copy panrom
+COPY . /usr/share/nginx/html/
 
-# Unga project files-ah copy panrom
-COPY . .
-
-# Just oru confirmation message
-CMD ["echo", "Farm Management App built on Alpine!"]
+# Port 80-ah container-kaaga open panrom
+EXPOSE 80
