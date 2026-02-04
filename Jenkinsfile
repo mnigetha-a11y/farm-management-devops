@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONAR_TOKEN = credentials('sonar-token-1')
+        SONARQUBE_SERVER = 'SonarQube'
     }
 
     stages {
@@ -13,35 +13,16 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('SonarQube Analysis') {
             steps {
-                bat '''
-                cd backend
-                npm install
-                npm test
-                '''
-            }
-        }
-
-        stage('Code Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonar-scanner'
-                    withSonarQubeEnv('sonar-server') {
-                        bat """
-                        ${scannerHome}\\bin\\sonar-scanner ^
-                        -Dsonar.projectKey=farm-mgmt ^
-                        -Dsonar.sources=. ^
-                        -Dsonar.login=%SONAR_TOKEN%
-                        """
-                    }
+                withSonarQubeEnv('SonarQube') {
+                    bat '''
+                    sonar-scanner ^
+                    -Dsonar.projectKey=farm-mgmt ^
+                    -Dsonar.projectName=farm-mgmt ^
+                    -Dsonar.sources=.
+                    '''
                 }
-            }
-        }
-
-        stage('Build and Deploy') {
-            steps {
-                echo "Build & Deploy stage running"
             }
         }
     }
