@@ -1,41 +1,44 @@
 pipeline {
     agent any
 
+    environment {
+        SONAR_TOKEN = credentials('sonar-token-1')
+    }
+
     stages {
-        stage('Checkout Source') {
+
+        stage('Checkout') {
             steps {
-                git branch: 'main', 
-                    credentialsId: 'github-pat', 
-                    url: 'https://github.com/mnigetha-a11y/farm-management-devops.git'
+                checkout scm
             }
         }
 
-        stage('Build & Push to DockerHub') {
+        stage('Test') {
             steps {
-                script {
-                    echo "Building Docker Image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        
-                        // Docker Hub Login
-                        bat "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
-                        
-                        // Build and Tag
-                        bat "docker build -t nigethadocker/farm-management-app:latest ."
-                        
-                        // Push to Docker Hub
-                        bat "docker push nigethadocker/farm-management-app:latest"
-                    }
+                bat '''
+                cd backend
+                npm install
+                npm test
+                '''
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    bat '''
+                    sonar-scanner ^
+                    -Dsonar.projectKey=farm-mgmt ^
+                    -Dsonar.sources=. ^
+                    -Dsonar.login=%SONAR_TOKEN%
+                    '''
                 }
             }
         }
 
-        stage('Kubernetes Deployment') {
+        stage('Build and Deploy') {
             steps {
-                script {
-                    echo "Deploying to Minikube..."
-                    // Kubernetes-la app-ah refresh pannum
-                    bat "kubectl rollout restart deployment farm-app-deployment"
-                }
+                echo "Build & Deploy stage will run here"
             }
         }
     }
