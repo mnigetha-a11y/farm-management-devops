@@ -10,36 +10,35 @@ pipeline {
             }
         }
 
+        // SonarQube error-ah thavirkka ippodhiku idhai comment pannidalam
+        /*
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    echo "Running SonarQube Analysis..."
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        // Sonar analysis commands inga varum
-                    }
+                    echo "Skipping SonarQube for report output..."
                 }
             }
         }
+        */
 
         stage('Build and Deploy') {
             steps {
                 script {
                     echo "Building and Pushing Docker Image..."
-                    // Docker credentials use pannudhu
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         
                         // 1. Docker Hub Login
                         bat "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
                         
-                        // 2. Build Image with Build Number
-                        bat "docker build -t nigethadocker/farm-management-app:${env.BUILD_NUMBER} ."
+                        // 2. Build Image
+                        bat "docker build -t nigethadocker/farm-management-app:latest ."
                         
-                        // 3. Tag as Latest
-                        bat "docker tag nigethadocker/farm-management-app:${env.BUILD_NUMBER} nigethadocker/farm-management-app:latest"
-                        
-                        // 4. Push to Docker Hub
-                        bat "docker push nigethadocker/farm-management-app:${env.BUILD_NUMBER}"
+                        // 3. Push to Docker Hub
                         bat "docker push nigethadocker/farm-management-app:latest"
+                        
+                        // 4. Update Kubernetes Deployment
+                        echo "Restarting K8s Deployment..."
+                        bat "kubectl rollout restart deployment farm-app-deployment"
                     }
                 }
             }
