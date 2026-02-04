@@ -5,10 +5,6 @@ pipeline {
         SONAR_TOKEN = credentials('sonar-token-1')
     }
 
-    tools {
-        sonarQubeScanner 'sonar-scanner'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -29,13 +25,16 @@ pipeline {
 
         stage('Code Analysis') {
             steps {
-                withSonarQubeEnv('sonar-server') {
-                    bat '''
-                    sonar-scanner ^
-                    -Dsonar.projectKey=farm-mgmt ^
-                    -Dsonar.sources=. ^
-                    -Dsonar.login=%SONAR_TOKEN%
-                    '''
+                script {
+                    def scannerHome = tool 'sonar-scanner'
+                    withSonarQubeEnv('sonar-server') {
+                        bat """
+                        ${scannerHome}\\bin\\sonar-scanner ^
+                        -Dsonar.projectKey=farm-mgmt ^
+                        -Dsonar.sources=. ^
+                        -Dsonar.login=%SONAR_TOKEN%
+                        """
+                    }
                 }
             }
         }
