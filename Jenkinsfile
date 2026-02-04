@@ -5,6 +5,10 @@ pipeline {
         SONAR_TOKEN = credentials('sonar-token-1')
     }
 
+    tools {
+        sonarQubeScanner 'sonar-scanner'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -38,7 +42,7 @@ pipeline {
 
         stage('Build and Deploy') {
             steps {
-                echo "Build & Deploy stage will run here"
+                echo "Build & Deploy stage running"
             }
         }
     }
