@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Source') {
             steps {
                 git branch: 'main', 
                     credentialsId: 'github-pat', 
@@ -10,36 +10,31 @@ pipeline {
             }
         }
 
-        // SonarQube error-ah thavirkka ippodhiku idhai comment pannidalam
-        /*
-        stage('SonarQube Analysis') {
+        stage('Build & Push to DockerHub') {
             steps {
                 script {
-                    echo "Skipping SonarQube for report output..."
+                    echo "Building Docker Image..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        
+                        // Docker Hub Login
+                        bat "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                        
+                        // Build and Tag
+                        bat "docker build -t nigethadocker/farm-management-app:latest ."
+                        
+                        // Push to Docker Hub
+                        bat "docker push nigethadocker/farm-management-app:latest"
+                    }
                 }
             }
         }
-        */
 
-        stage('Build and Deploy') {
+        stage('Kubernetes Deployment') {
             steps {
                 script {
-                    echo "Building and Pushing Docker Image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        
-                        // 1. Docker Hub Login
-                        bat "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
-                        
-                        // 2. Build Image
-                        bat "docker build -t nigethadocker/farm-management-app:latest ."
-                        
-                        // 3. Push to Docker Hub
-                        bat "docker push nigethadocker/farm-management-app:latest"
-                        
-                        // 4. Update Kubernetes Deployment
-                        echo "Restarting K8s Deployment..."
-                        bat "kubectl rollout restart deployment farm-app-deployment"
-                    }
+                    echo "Deploying to Minikube..."
+                    // Kubernetes-la app-ah refresh pannum
+                    bat "kubectl rollout restart deployment farm-app-deployment"
                 }
             }
         }
