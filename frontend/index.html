@@ -2,44 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nigetha's Farm Portal</title>
+    <title>Cloud Farm Management System</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4; }
-        .container { background: white; padding: 20px; border-radius: 10px; display: inline-block; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; }
-        #status-box { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #fff; }
-        .success { color: #27ae60; font-weight: bold; }
+        :root { --primary: #2e7d32; --bg: #f4f7f4; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        #login-section {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .login-card { background: white; padding: 40px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #dashboard-section { display: none; }
+        nav { background: var(--primary); color: white; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; border-bottom: 5px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        input, .btn { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+        .btn { background: var(--primary); color: white; cursor: pointer; font-weight: bold; border: none; }
     </style>
 </head>
 <body>
+    <div id="login-section">
+        <div class="login-card">
+            <h2 style="color: var(--primary);">🌾 Farm Cloud</h2>
+            <input type="text" id="username" placeholder="Username (admin)">
+            <input type="password" id="password" placeholder="Password (admin123)">
+            <button class="btn" onclick="validateLogin()">LOGIN</button>
+        </div>
+    </div>
 
-    <div class="container">
-        <h1>🚜 Farm Management Systems</h1>
-        <p>Frontend is running on Nginx (Port 8085)</p>
-
-        <div id="status-box">
-            <p>Backend Status:</p>
-            <h3 id="backend-msg">Connecting to backend...</h3>
+    <div id="dashboard-section">
+        <nav><span>🌿 Smart Farm Management Dashboard</span><button onclick="location.reload()" style="color:white; background:none; border:1px solid white; cursor:pointer;">Logout</button></nav>
+        <div class="grid">
+            <div class="stat-card"><h3>Soil Moisture</h3><h2 style="color:var(--primary)">42%</h2><p>Status: Optimal</p></div>
+            <div class="stat-card"><h3>Live Livestock</h3><h2 style="color:var(--primary)">128</h2><p>All Active</p></div>
+            <div class="stat-card"><h3>K8s Cluster</h3><h2 style="color:var(--primary)">Stable</h2><p>Node: Minikube</p></div>
         </div>
     </div>
 
     <script>
-        async function fetchStatus() {
-            try {
-                // Backend URL check
-                const response = await fetch('http://localhost:4000/api/status');
-                const data = await response.json();
-                
-                document.getElementById('backend-msg').innerText = data.message;
-                document.getElementById('backend-msg').classList.add('success');
-            } catch (error) {
-                document.getElementById('backend-msg').innerText = "Backend Connection Failed!";
-                document.getElementById('backend-msg').style.color = "red";
-                console.error("Error fetching status:", error);
-            }
+        function validateLogin() {
+            var user = document.getElementById("username").value;
+            var pass = document.getElementById("password").value;
+            if (user === "admin" && pass === "admin123") {
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("dashboard-section").style.display = "block";
+            } else { alert("Invalid Credentials!"); }
         }
-        fetchStatus();
     </script>
 </body>
 </html>

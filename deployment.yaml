@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+<<<<<<< HEAD
   name: farm-mgmt
 spec:
   replicas: 1
@@ -30,3 +31,21 @@ spec:
       port: 80
       targetPort: 3000
   type: NodePort
+=======
+  name: farm-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: farm-app
+  template:
+    metadata:
+      labels:
+        app: farm-app
+    spec:
+      containers:
+      - name: farm-app-container
+        image: nigethadocker/farm-management-app:latest
+        ports:
+        - containerPort: 80
+>>>>>>> e30e935 (Integrated login and dashboard)
