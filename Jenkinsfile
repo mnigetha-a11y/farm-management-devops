@@ -6,7 +6,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -16,10 +15,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    bat """
-                    %SCANNER_HOME%\\bin\\sonar-scanner.bat ^
-                    -Dsonar.projectKey=FarmManagement
-                    """
+                    bat "%SCANNER_HOME%\\bin\\sonar-scanner.bat -Dsonar.projectKey=FarmManagement"
                 }
             }
         }
