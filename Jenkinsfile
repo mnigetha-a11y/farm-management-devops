@@ -1,20 +1,23 @@
 pipeline {
     agent any
 
+    tools {
+        // Jenkins Tools-la neenga 'SonarScanner' nu peru vacha dhaan idhu vela seiyum
+        sonarScanner 'SonarScanner' 
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Repository-ah download pannum
                 checkout scm
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                // 'sonar-server' nu name unga Jenkins settings-la irukradhu match aagum
+                // Settings-la neenga vacha 'sonar-server' name match aagudhu
                 withSonarQubeEnv('sonar-server') {
-                    // Windows machine nu log-la pathom, so 'bat' use panrom
-                    // 'SonarScanner' nu oru tool config panni irundha idha use pannunga
+                    // Windows machine-la tool-ah call panna 'bat' use panrom
                     bat 'sonar-scanner'
                 }
             }
@@ -22,7 +25,6 @@ pipeline {
         
         stage("Quality Gate") {
             steps {
-                // SonarQube analysis mudiyura varai wait pannum
                 waitForQualityGate abortPipeline: true
             }
         }
