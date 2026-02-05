@@ -15,12 +15,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                withSonarQubeEnv('sonar-server') {
                     bat """
-                    ${SCANNER_HOME}\\bin\\sonar-scanner.bat ^
-                    -Dsonar.projectKey=FarmManagement ^
-                    -Dsonar.host.url=http://localhost:9000 ^
-                    -Dsonar.login=%SONAR_TOKEN%
+                    %SCANNER_HOME%\\bin\\sonar-scanner.bat ^
+                    -Dsonar.projectKey=FarmManagement
                     """
                 }
             }
