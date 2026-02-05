@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     tools {
-        // 'sonarScanner' nu irundhadha ippo 'hudson.plugins.sonar.SonarRunnerInstallation' nu mathi irukkom
         'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner' 
     }
 
@@ -16,7 +15,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    // Windows machine-la 'bat' use panni scanner-ah run panrom
                     bat 'sonar-scanner'
                 }
             }
@@ -28,4 +26,4 @@ pipeline {
             }
         }
     }
-}s
+}
