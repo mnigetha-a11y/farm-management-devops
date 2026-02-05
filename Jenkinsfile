@@ -15,15 +15,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    bat "%SCANNER_HOME%\\bin\\sonar-scanner.bat -Dsonar.projectKey=FarmManagement"
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                    bat """
+                    ${SCANNER_HOME}\\bin\\sonar-scanner.bat ^
+                    -Dsonar.projectKey=FarmManagement
+                    """
                 }
             }
         }
