@@ -1,13 +1,15 @@
 pipeline {
     agent any
 
-    tools {
-        'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner' 
+    environment {
+        // Neenga extract panna scanner folder path
+        SCANNER_HOME = 'C:\\sonar-scanner\\sonar-scanner-8.0.1.6346-windows-x64'
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Unga code-ai git-la irundhu edukum
                 checkout scm
             }
         }
@@ -15,14 +17,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    bat 'sonar-scanner'
+                    // Direct-ah bin folder ulla irukkura .bat file-ai run pannum
+                    bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat"
                 }
             }
         }
-        
-        stage("Quality Gate") {
+
+        stage('Quality Gate') {
             steps {
-                waitForQualityGate abortPipeline: true
+                waitForQuality Gate abortPipeline: true
             }
         }
     }
