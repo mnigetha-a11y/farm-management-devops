@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        // Jenkins Tools-la neenga 'SonarScanner' nu peru vacha dhaan idhu vela seiyum
-        sonarScanner 'SonarScanner' 
+        // 'sonarScanner' nu irundhadha ippo 'hudson.plugins.sonar.SonarRunnerInstallation' nu mathi irukkom
+        'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarScanner' 
     }
 
     stages {
@@ -15,9 +15,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                // Settings-la neenga vacha 'sonar-server' name match aagudhu
                 withSonarQubeEnv('sonar-server') {
-                    // Windows machine-la tool-ah call panna 'bat' use panrom
+                    // Windows machine-la 'bat' use panni scanner-ah run panrom
                     bat 'sonar-scanner'
                 }
             }
@@ -29,4 +28,4 @@ pipeline {
             }
         }
     }
-}
+}s
