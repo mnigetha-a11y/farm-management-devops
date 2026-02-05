@@ -2,14 +2,12 @@ pipeline {
     agent any
 
     environment {
-        // Neenga extract panna scanner folder path
         SCANNER_HOME = 'C:\\sonar-scanner\\sonar-scanner-8.0.1.6346-windows-x64'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Unga code-ai git-la irundhu edukum
                 checkout scm
             }
         }
@@ -17,7 +15,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    // Direct-ah bin folder ulla irukkura .bat file-ai run pannum
                     bat "${SCANNER_HOME}\\bin\\sonar-scanner.bat"
                 }
             }
@@ -25,7 +22,8 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                waitForQuality Gate abortPipeline: true
+                // Inga dhaan space illama correct-ah irukanum
+                waitForQualityGate abortPipeline: true
             }
         }
     }
