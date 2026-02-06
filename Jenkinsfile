@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // Change these names based on your Jenkins Global Tool Configuration
+        // IMPORTANT: Jenkins -> Tools-ல் நீங்கள் கொடுத்த அதே பெயர் இங்கே இருக்க வேண்டும்
         SCANNER_HOME = tool 'SonarScanner'
         APP_NAME = "farm-management-app"
     }
@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('1. Checkout Code') {
             steps {
-                // Pulls the code from your 'main' branch
+                // இது தானாகவே 'main' பிராஞ்சை டவுன்லோட் செய்யும்
                 checkout scm
             }
         }
@@ -18,12 +18,14 @@ pipeline {
         stage('2. SonarQube Quality Check') {
             steps {
                 script {
-                    // 'sonar-server' is the name configured in Jenkins -> System
+                    // Jenkins -> System-ல் நீங்கள் கொடுத்த 'sonar-server' பெயருடன் மேட்ச் ஆக வேண்டும்
                     withSonarQubeEnv('sonar-server') {
-                        bat "${SCANNER_HOME}/bin/sonar-scanner.bat " +
-                            "-Dsonar.projectKey=farm-management-devops " +
-                            "-Dsonar.sources=. " +
-                            "-Dsonar.host.url=http://localhost:9000"
+                        bat """
+                        "${SCANNER_HOME}\\bin\\sonar-scanner.bat" ^
+                        -Dsonar.projectKey=farm-management-devops ^
+                        -Dsonar.sources=. ^
+                        -Dsonar.host.url=http://localhost:9000
+                        """
                     }
                 }
             }
@@ -33,24 +35,24 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image inside Minikube..."
-                    // Directly builds the image inside Minikube's internal Docker registry
+                    // Windows-ல் 'minikube image build' பயன்படுத்துவது சிறந்தது
                     bat "minikube image build -t ${APP_NAME}:latest ."
                 }
             }
         }
 
-        stage('4. Deploy to Kubernetes (Minikube)') {
+        stage('4. Deploy App to Kubernetes') {
             steps {
-                echo "Deploying the Application..."
-                // Ensure you have a 'k8s' folder with deployment.yaml and service.yaml
+                echo "Deploying App to Minikube..."
+                // உங்கள் k8s ஃபோல்டரில் உள்ள deployment மற்றும் service ஃபைல்களை ரன் செய்யும்
                 bat "kubectl apply -f k8s/"
             }
         }
 
         stage('5. Setup Prometheus & Grafana') {
             steps {
-                echo "Setting up Monitoring Tools..."
-                // Ensure you have a 'monitoring' folder with Prometheus/Grafana YAMLs
+                echo "Applying Monitoring (Prometheus & Grafana)..."
+                // உங்கள் monitoring ஃபோல்டரில் உள்ள YAML ஃபைல்களை ரன் செய்யும்
                 bat "kubectl apply -f monitoring/"
             }
         }
@@ -58,10 +60,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline Successful! All stages completed."
+            echo "Congratulations! Your CI/CD pipeline finished successfully."
         }
         failure {
-            echo "Pipeline Failed. Please check the logs."
+            echo "Pipeline failed. Check SonarScanner name in Jenkins Tools or Minikube status."
         }
     }
 }
