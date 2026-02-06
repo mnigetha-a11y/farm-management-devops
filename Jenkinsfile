@@ -3,52 +3,54 @@ pipeline {
 
     stages {
 
-        // Stage 1: Checkout code
-        stage('Checkout') {
+        // -------------------------------
+        stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/your-repo.git', branch: 'main'
+                git url: 'https://github.com/mnigetha-a11y/farm-management-devops.git', branch: 'main'
             }
         }
 
-        // Stage 2: SonarQube Analysis (optional)
+        // -------------------------------
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('MySonarQubeServer') {
-                    // Node.js project example:
-                    sh 'npm install'
-                    sh 'npm run lint'
-                }
+                echo 'Skipping SonarQube analysis (optional)'
+                // If later you want SonarQube, uncomment below
+                // withSonarQubeEnv('MySonarQubeServer') {
+                //     sh 'npm install && npm run lint'
+                // }
             }
         }
 
-        // Stage 3: Set Minikube Docker environment
-        stage('Set Minikube Docker Env') {
+        // -------------------------------
+        stage('Set Minikube Docker Environment') {
             steps {
-                // Linux/Mac
+                // Activate Minikube Docker environment
                 sh 'eval $(minikube docker-env)'
-                // Windows PowerShell: minikube docker-env --shell powershell
+                echo 'Minikube Docker environment set'
             }
         }
 
-        // Stage 4: Build Docker images
+        // -------------------------------
         stage('Build Docker Images') {
             steps {
                 sh 'docker build -t farm-backend ./backend'
                 sh 'docker build -t farm-frontend ./frontend'
+                echo 'Docker images built successfully'
             }
         }
 
-        // Stage 5: Deploy Backend & Frontend to Minikube
-        stage('Deploy to Kubernetes') {
+        // -------------------------------
+        stage('Deploy to Kubernetes (Minikube)') {
             steps {
                 sh 'kubectl apply -f backend-deployment.yml'
                 sh 'kubectl apply -f backend-service.yml'
                 sh 'kubectl apply -f frontend-deployment.yml'
                 sh 'kubectl apply -f frontend-service.yml'
+                echo 'Kubernetes deployments and services applied'
             }
         }
 
-        // Stage 6: Deploy Prometheus & Grafana using Helm
+        // -------------------------------
         stage('Prometheus & Grafana Setup') {
             steps {
                 sh 'helm repo add prometheus-community https://prometheus-community.github.io/helm-charts'
@@ -57,17 +59,17 @@ pipeline {
 
                 sh 'helm install prometheus prometheus-community/prometheus'
                 sh 'helm install grafana grafana/grafana'
+                echo 'Prometheus & Grafana deployed successfully'
             }
         }
-
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully! 🚀'
+            echo '🎉 Pipeline completed successfully! Build SUCCESS'
         }
         failure {
-            echo 'Pipeline failed! ❌'
+            echo '❌ Pipeline failed! Check the logs'
         }
     }
 }
