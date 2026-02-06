@@ -2,17 +2,16 @@ pipeline {
     agent any
 
     environment {
-        // Ensure this matches the name in Manage Jenkins -> Tools
         SCANNER_HOME = tool 'SonarScanner'
-        // Ensure this matches the name in Manage Jenkins -> System
-        SONAR_SERVER = 'sonar-server'
         APP_NAME = "farm-management-app"
+        // 1. Force Jenkins to look at your specific user folder
+        MINIKUBE_HOME = 'C:\\Users\\acer'
+        KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Automatically clones the repository
                 checkout scm
             }
         }
@@ -20,8 +19,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // This block triggers the code quality scan
-                    withSonarQubeEnv(SONAR_SERVER) {
+                    withSonarQubeEnv('sonar-server') {
                         bat """
                         "${SCANNER_HOME}\\bin\\sonar-scanner.bat" ^
                         -Dsonar.projectKey=farm-management-devops ^
@@ -35,35 +33,29 @@ pipeline {
 
         stage('Docker Build (Minikube)') {
             steps {
-                echo "Building Docker Image inside Minikube environment..."
-                // Build the image directly into Minikube's internal registry
-                bat "minikube image build -t ${APP_NAME}:latest ."
+                echo "Building Docker Image..."
+                // 2. Added '-p minikube' to specify the profile
+                bat "minikube image build -p minikube -t ${APP_NAME}:latest ."
             }
         }
 
         stage('Kubernetes Deployment') {
             steps {
-                echo "Deploying Application to Minikube..."
-                // Applies all YAML files in the k8s folder
+                echo "Deploying to Minikube..."
                 bat "kubectl apply -f k8s/"
             }
         }
 
-        stage('Prometheus & Grafana Setup') {
+        stage('Prometheus & Grafana') {
             steps {
-                echo "Deploying Monitoring Stack..."
-                // Applies all monitoring YAML files (Prometheus/Grafana)
                 bat "kubectl apply -f monitoring/"
             }
         }
     }
 
     post {
-        success {
-            echo "Pipeline completed successfully!"
-        }
         failure {
-            echo "Pipeline failed. Please check the Jenkins Tool configuration or Minikube status."
+            echo "Build failed. Check if minikube is running in CMD."
         }
     }
 }
