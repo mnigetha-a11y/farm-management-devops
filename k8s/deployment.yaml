@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: farm-app
+  name: farm-app-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: farm-app
@@ -14,7 +14,6 @@ spec:
     spec:
       containers:
       - name: farm-app-container
-        image: farm-management-app:latest
-        imagePullPolicy: Never
+        image: nigethadocker/farm-management-app:latest
         ports:
         - containerPort: 80
