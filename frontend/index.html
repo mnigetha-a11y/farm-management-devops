@@ -4,30 +4,67 @@
 <meta charset="UTF-8">
 <title>Smart Farm Management System</title>
 <style>
-/* CSS remains the same as your previous version for background images */
 :root { --primary:#2e7d32; --bg:#f4f7f4; --danger:#d32f2f; --secondary: #1b5e20; }
 body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); }
+
+/* Login Page */
 #login { height:100vh; display:flex; justify-content:center; align-items:center; background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200'); background-size:cover; }
 .card { background:rgba(255,255,255,0.9); padding:30px; border-radius:12px; width:300px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(5px); }
 input, button { width:100%; padding:12px; margin:10px 0; border-radius:6px; box-sizing: border-box; border: 1px solid #ccc; }
 button { background:var(--primary); color:white; border:none; cursor:pointer; font-weight: bold; transition: 0.3s; }
 button:hover { background: var(--secondary); }
+
+/* Dashboard */
 #dashboard { display:none; }
-nav { background:var(--primary); color:white; padding:15px 30px; display:flex; justify-content:space-between; align-items: center; }
+nav { background:var(--primary); color:white; padding:15px 30px; display:flex; justify-content:space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; padding:20px 30px; }
-.box { background-size: cover; background-position: center; padding:25px; border-radius:15px; box-shadow:0 6px 15px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s; color: white; position: relative; overflow: hidden; min-height: 180px; }
-.box::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 100%); z-index: 1; }
+
+/* Box Styles with Background Images */
+.box { 
+    background-size: cover; 
+    background-position: center; 
+    padding:25px; 
+    border-radius:15px; 
+    box-shadow:0 6px 15px rgba(0,0,0,0.15); 
+    cursor: pointer; 
+    transition: 0.3s; 
+    color: white; 
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    border: none;
+}
+
+/* Card Overlays for readability */
+.box::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 100%);
+    z-index: 1;
+}
+
 .box > * { position: relative; z-index: 2; }
+.box:hover { transform: translateY(-8px); box-shadow: 0 12px 20px rgba(0,0,0,0.3); }
+
+/* Specific Backgrounds */
 .bg-soil { background-image: url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=500'); }
 .bg-irrigation { background-image: url('https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?auto=format&fit=crop&w=500'); }
 .bg-livestock { background-image: url('https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=500'); }
 .bg-register { background-image: url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=500'); }
 .bg-inventory { background-image: url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=500'); }
+
+/* Inventory Table & Forms */
 .form-input { background: rgba(255,255,255,0.9) !important; color: #333; }
-table { width:100%; border-collapse:collapse; background: rgba(255,255,255,0.95); color: #333; }
+table { width:100%; border-collapse:collapse; background: rgba(255,255,255,0.95); border-radius: 8px; overflow: hidden; color: #333; }
 th, td { padding:12px; border-bottom:1px solid #eee; text-align: left; }
+th { background: #e8f5e9; color: var(--primary); }
+.del-btn { background:var(--danger); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size: 12px; }
+
+/* Modal */
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
-.modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 15px; width: 600px; position: relative; }
+.modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 15px; width: 600px; max-height: 80vh; overflow-y: auto; position: relative; line-height: 1.6; }
+.close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #666; }
 </style>
 </head>
 <body>
@@ -35,83 +72,129 @@ th, td { padding:12px; border-bottom:1px solid #eee; text-align: left; }
 <div id="login">
   <div class="card">
     <h2 style="color:var(--primary)">Smart Farm Portal</h2>
-    <input type="text" id="user" placeholder="Username">
-    <input type="password" id="pass" placeholder="Password">
+    <input type="text" id="user" placeholder="Username (admin)">
+    <input type="password" id="pass" placeholder="Password (admin123)">
     <button onclick="doLogin()">Login</button>
   </div>
 </div>
 
 <div id="dashboard">
-  <nav><h3>🌿 Smart Farm Dashboard</h3><button onclick="location.reload()">Logout</button></nav>
+  <nav>
+    <h3 style="margin:0;">🌿 Smart Farm Dashboard</h3>
+    <button onclick="location.reload()" style="width: auto; padding: 8px 20px; background:rgba(255,255,255,0.2);">Logout</button>
+  </nav>
+
   <div class="grid">
-    <div class="box bg-soil" onclick="openSoilAnalysis()"><h3>Soil Moisture</h3><p>Analysis Report →</p></div>
-    <div class="box bg-irrigation" onclick="openIrrigationReport()"><h3>Irrigation</h3><p>System Active →</p></div>
-    <div class="box bg-livestock" onclick="openLivestockReport()"><h3>Livestock</h3><p>120 Units →</p></div>
+    <div class="box bg-soil" onclick="openSoilAnalysis()">
+      <h3>Soil Moisture</h3>
+      <h2 style="color:#81c784">Analysis Report</h2>
+      <p>Click for Crop Suitability by Percentage →</p>
+    </div>
+
+    <div class="box bg-irrigation" onclick="openIrrigationReport()">
+      <h3>Irrigation System</h3>
+      <h2 style="color:#81c784">Active</h2>
+      <p>Water Usage Report →</p>
+    </div>
+
+    <div class="box bg-livestock" onclick="openLivestockReport()">
+      <h3>Livestock Count</h3>
+      <h2>120 Units</h2>
+      <p>Health & Feed Insights →</p>
+    </div>
   </div>
+
   <div class="grid">
-    <div class="box bg-register">
+    <div class="box bg-register" style="cursor: default;">
       <h3>➕ Register New Crop</h3>
       <input type="text" id="cName" class="form-input" placeholder="Crop Name">
-      <input type="text" id="cArea" class="form-input" placeholder="Area">
-      <button onclick="saveToBackend()">Save to Server</button>
+      <input type="text" id="cArea" class="form-input" placeholder="Area (Acres)">
+      <input type="text" id="cStatus" class="form-input" placeholder="Status (Growing/Harvested)">
+      <button onclick="saveToInventory()">Store Data to Inventory</button>
     </div>
-    <div class="box bg-inventory">
-      <h3>🌾 Farm Inventory</h3>
-      <table>
-        <thead><tr><th>Crop</th><th>Area</th><th>Action</th></tr></thead>
-        <tbody id="inventoryList"></tbody>
-      </table>
+    
+    <div class="box bg-inventory" style="cursor: default;">
+      <h3 style="margin-bottom:15px;">🌾 Farm Inventory</h3>
+      <div style="max-height: 250px; overflow-y: auto;">
+          <table>
+            <thead>
+              <tr><th>Crop</th><th>Area</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="inventoryList"></tbody>
+          </table>
+      </div>
     </div>
   </div>
 </div>
 
+<div id="infoModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2 id="modalTitle" style="color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">Report</h2>
+    <div id="modalBody" style="margin-top: 20px;"></div>
+  </div>
+</div>
+
 <script>
-const API_URL = "http://localhost:3001/api/crops"; // Backend Port
+let cropsData = JSON.parse(localStorage.getItem('farmInventory')) || [];
 
 function doLogin(){
   if(document.getElementById("user").value==="admin" && document.getElementById("pass").value==="admin123"){
     document.getElementById("login").style.display="none";
     document.getElementById("dashboard").style.display="block";
-    loadFromBackend();
-  } else alert("Wrong credentials!");
+    loadInventory();
+  } else alert("Invalid Login!");
 }
 
-// POST: Data-va server-kku anuppa
-async function saveToBackend() {
+function saveToInventory() {
     const name = document.getElementById("cName").value;
     const area = document.getElementById("cArea").value;
-    if(!name || !area) return alert("Fields fill pannunga!");
+    const status = document.getElementById("cStatus").value || "Growing";
+    if(!name || !area) return alert("Fill all fields!");
 
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, area, status: "Growing" })
-    });
-
-    if(response.ok) {
-        document.getElementById("cName").value = "";
-        document.getElementById("cArea").value = "";
-        loadFromBackend();
-    }
+    cropsData.push({ name, area, status });
+    localStorage.setItem('farmInventory', JSON.stringify(cropsData));
+    loadInventory();
+    document.getElementById("cName").value = ""; 
+    document.getElementById("cArea").value = "";
+    document.getElementById("cStatus").value = "";
 }
 
-// GET: Server-la irunthu data-va edukka
-async function loadFromBackend() {
-    const response = await fetch(API_URL);
-    const data = await response.json();
+function loadInventory() {
     let html = "";
-    data.forEach((item, index) => {
-        html += `<tr><td>${item.name}</td><td>${item.area}</td>
-        <td><button onclick="deleteFromBackend(${index})" style="background:red; color:white; border:none; padding:4px 8px; cursor:pointer;">Delete</button></td></tr>`;
+    cropsData.forEach((item, index) => {
+        html += `<tr><td>${item.name}</td><td>${item.area}</td><td>${item.status}</td>
+        <td><button class="del-btn" onclick="deleteCrop(${index})">Delete</button></td></tr>`;
     });
     document.getElementById("inventoryList").innerHTML = html;
 }
 
-// DELETE: Server-la irunthu data-va neekka
-async function deleteFromBackend(index) {
-    await fetch(`${API_URL}/${index}`, { method: 'DELETE' });
-    loadFromBackend();
+function deleteCrop(index) {
+    if(confirm("Delete record?")) {
+        cropsData.splice(index, 1);
+        localStorage.setItem('farmInventory', JSON.stringify(cropsData));
+        loadInventory();
+    }
 }
+
+function openSoilAnalysis() {
+    showModal("Soil Moisture Guide", "<p><b>30% (Low):</b> Groundnut, Millets<br><b>50% (Optimal):</b> Maize, Cotton<br><b>70% (High):</b> Paddy, Sugarcane</p>");
+}
+
+function openIrrigationReport() {
+    showModal("Irrigation Insights", "<p><b>System Status:</b> Operational<br><b>Flow Rate:</b> 2.8L/sec<br>Automated scheduling is active.</p>");
+}
+
+function openLivestockReport() {
+    showModal("Livestock Summary", "<p><b>Total Units:</b> 120<br><b>Health:</b> Excellent<br>Vaccination scheduled for next month.</p>");
+}
+
+function showModal(t, b) {
+    document.getElementById("modalTitle").innerHTML = t;
+    document.getElementById("modalBody").innerHTML = b;
+    document.getElementById("infoModal").style.display = "block";
+}
+function closeModal() { document.getElementById("infoModal").style.display = "none"; }
 </script>
 </body>
 </html>
